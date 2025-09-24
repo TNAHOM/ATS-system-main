@@ -169,3 +169,7 @@ func (j *JobPost) UpdateJobPost(ctx context.Context, req dto.UpdateJobPostReques
 	}
 	return updated, nil
 }
+
+func (j *JobPost) DeleteJobPost(ctx context.Context, id string) error {
+	return j.jobPostStorage.DeleteJobPost(ctx, id)
+}

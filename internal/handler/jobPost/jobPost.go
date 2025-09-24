@@ -9,6 +9,7 @@ import (
 	"github.com/TNAHOM/ATS-system-main/platform/response"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 type jobPost struct {
@@ -50,7 +51,6 @@ func (j *jobPost) GetAllJobPosts(ctx *gin.Context) {
 
 func (j *jobPost) UpdateJobPost(ctx *gin.Context) {
 	id := ctx.Param("id")
-
 	if id == "" {
 		response.SendError(ctx, http.StatusBadRequest, "missing id", nil)
 		return
@@ -61,6 +61,10 @@ func (j *jobPost) UpdateJobPost(ctx *gin.Context) {
 		response.SendError(ctx, http.StatusBadRequest, "validation failed", err)
 		return
 	}
+	if req.Title == nil && req.Description == nil && req.Deadline == nil && req.Responsibilities == nil && req.Requirements == nil {
+		response.SendError(ctx, http.StatusBadRequest, "no fields provided to update", nil)
+		return
+	}
 	req.ID = id
 	updated, err := j.jobPostModule.UpdateJobPost(ctx, req)
 	if err != nil {
@@ -69,4 +73,22 @@ func (j *jobPost) UpdateJobPost(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, dto.Envelope[dto.UpdateJobPostResponse]{Data: updated})
+}
+
+func (j *jobPost) DeleteJobPost(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id == "" {
+		response.SendError(ctx, http.StatusBadRequest, "missing id", nil)
+		return
+	}
+	if err := j.jobPostModule.DeleteJobPost(ctx, id); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			response.SendError(ctx, http.StatusNotFound, "job post not found", nil)
+			return
+		}
+		j.log.Error("failed to delete job post", zap.Error(err))
+		response.SendError(ctx, http.StatusInternalServerError, "internal server error", nil)
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Envelope[any]{Data: gin.H{"deleted": true}})
 }

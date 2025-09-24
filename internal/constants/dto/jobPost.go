@@ -46,11 +46,11 @@ type GetAllJobPostsResponse struct {
 // UpdateJobPostRequest supports partial updates; omitted fields are ignored.
 type UpdateJobPostRequest struct {
 	ID               string     `json:"id"`
-	Title            *string    `json:"title,omitempty"`
-	Description      *string    `json:"description,omitempty"`
-	Deadline         *time.Time `json:"deadline,omitempty"`
-	Responsibilities *[]string  `json:"responsibilities,omitempty"`
-	Requirements     *[]string  `json:"requirements,omitempty"`
+	Title            *string    `json:"title,omitempty" binding:"omitempty,min=1,max=255"`
+	Description      *string    `json:"description,omitempty" binding:"omitempty,min=1"`
+	Deadline         *time.Time `json:"deadline,omitempty" binding:"omitempty"`
+	Responsibilities *[]string  `json:"responsibilities,omitempty" binding:"omitempty,min=1,dive,required"`
+	Requirements     *[]string  `json:"requirements,omitempty" binding:"omitempty,min=1,dive,required"`
 
 	DescriptionEmbedding      *pgvector.Vector `json:"-"`
 	RequirementsEmbedding     *pgvector.Vector `json:"-"`

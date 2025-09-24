@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 	"github.com/pgvector/pgvector-go"
+	"gorm.io/gorm"
 )
 
 type JobPost struct {
@@ -19,9 +20,10 @@ type JobPost struct {
 	Responsibilities pq.StringArray `gorm:"type:text[]" json:"responsibilities"`
 	Requirements     pq.StringArray `gorm:"type:text[]" json:"requirements"`
 
-	Deadline  time.Time `json:"deadline"`
-	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+	Deadline  time.Time      `json:"deadline"`
+	CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 
 	DescriptionEmbedding      pgvector.Vector `gorm:"type:vector(3072)" json:"description_embedding"`
 	RequirementsEmbedding     pgvector.Vector `gorm:"type:vector(3072)" json:"requirements_embedding"`

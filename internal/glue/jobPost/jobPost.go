@@ -41,6 +41,14 @@ func Init(
 				middleware.AuthMiddleware(log),
 			},
 		},
+		{
+			Method:  http.MethodDelete,
+			Path:    "/jobPost/:id",
+			Handler: jobPostHandler.DeleteJobPost,
+			Middleware: []gin.HandlerFunc{
+				middleware.AuthMiddleware(log),
+			},
+		},
 	}
 	routing.RegisterRoute(group, jobPostRoutes, log)
 }

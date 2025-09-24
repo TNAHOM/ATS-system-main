@@ -130,3 +130,15 @@ func (j *JobPost) UpdateJobPost(ctx context.Context, req dto.UpdateJobPostReques
 
 	return j.GetJobPostByID(ctx, req.ID)
 }
+
+func (j *JobPost) DeleteJobPost(ctx context.Context, id string) error {
+	tx := j.db.WithContext(ctx).Where("id = ?", id).Delete(&models.JobPost{})
+	if tx.Error != nil {
+		j.log.Error("failed to soft delete job post", zap.String("id", id), zap.Error(tx.Error))
+		return tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}

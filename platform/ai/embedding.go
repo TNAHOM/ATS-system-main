@@ -27,16 +27,21 @@ func NewClient(ctx context.Context) (*genai.Client, error) {
 }
 
 // Embedding generates an embedding vector for text using a provided client.
-func Embedding(ctx context.Context, client *genai.Client, text any) (pgvector.Vector, error) {
-	if text == "" {
+func Embedding(ctx context.Context, client *genai.Client, text []string) (pgvector.Vector, error) {
+	if len(text) == 0 {
 		return pgvector.Vector{}, errors.New("embedding: empty text")
+	}
+
+	contents := []*genai.Content{}
+	for _, t := range text {
+		contents = append(contents, genai.NewContentFromText(t, genai.RoleUser))
 	}
 
 	res, err := client.Models.EmbedContent(
 		ctx,
 		embeddingModel,
-		[]*genai.Content{genai.NewContentFromText(text, genai.RoleUser)},
-		nil,
+		contents,
+		&genai.EmbedContentConfig{OutputDimensionality: func() *int32 { v := int32(embeddingDim); return &v }()},
 	)
 	if err != nil {
 		return pgvector.Vector{}, errors.New("embedding: " + err.Error())

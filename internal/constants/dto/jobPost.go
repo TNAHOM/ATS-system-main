@@ -9,9 +9,9 @@ import (
 
 type CreateJobPostRequest struct {
 	ID          string    `json:"id"`
+	UserID      uuid.UUID `json:"user_id"`
 	Title       string    `json:"title" binding:"required"`
 	Description string    `json:"description" binding:"required"`
-	UserID      uuid.UUID `json:"user_id" binding:"required,uuid"`
 	Deadline    time.Time `json:"deadline" binding:"required"`
 
 	Responsibilities []string `json:"responsibilities" binding:"required,dive,required"`
@@ -31,4 +31,15 @@ type CreateJobPostResponse struct {
 	UserID           uuid.UUID `json:"user_id"`
 	Deadline         time.Time `json:"deadline"`
 	// CreatedAt   time.Time `json:"created_at"`
+}
+
+// GetAllJobPostsResponse represents a single job post in list responses
+type GetAllJobPostsResponse struct {
+	ID               string    `json:"id"`
+	Title            string    `json:"title"`
+	Description      string    `json:"description"`
+	Responsibilities []string  `json:"responsibilities"`
+	Requirements     []string  `json:"requirements"`
+	UserID           uuid.UUID `json:"user_id"`
+	Deadline         time.Time `json:"deadline"`
 }

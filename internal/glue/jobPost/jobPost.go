@@ -25,6 +25,14 @@ func Init(
 				// middleware.AuthUserTypeMiddleware(log, "recruiter"),
 			},
 		},
+		{
+			Method:  http.MethodGet,
+			Path:    "/jobPost/getAllJobPosts",
+			Handler: jobPostHandler.GetAllJobPosts,
+			Middleware: []gin.HandlerFunc{
+				middleware.AuthMiddleware(log),
+			},
+		},
 	}
 	routing.RegisterRoute(group, jobPostRoutes, log)
 }

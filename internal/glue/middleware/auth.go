@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"fmt"
+	"context"
 	"net/http"
 	"strings"
 
@@ -37,11 +37,11 @@ func AuthMiddleware(log *zap.Logger) gin.HandlerFunc {
 			return
 		}
 
-		// ctx := context.WithValue(ctx.Request.Context(), "claims", claims)
-		// ctx.Request = ctx.Request.WithContext(ctx)
-		fmt.Println("claims: s", claims)
-
 		ctx.Set("claims", claims)
+
+		// also put claims into the http request's context so downstream modules receiving context.Context can access it
+		reqCtx := context.WithValue(ctx.Request.Context(), "claims", claims)
+		ctx.Request = ctx.Request.WithContext(reqCtx)
 		ctx.Next()
 	}
 }
@@ -71,7 +71,6 @@ func ProxyHandler(targetURL string, log *zap.Logger) gin.HandlerFunc {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing claims"})
 			return
 		}
-		fmt.Println("claims: s", v)
 
 		claims, ok := v.(*encryption.SignedDetails)
 		if !ok {

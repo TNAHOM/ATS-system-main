@@ -37,3 +37,13 @@ func (j *jobPost) CreateJobPost(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, dto.Envelope[dto.CreateJobPostResponse]{Data: res})
 }
+
+func (j *jobPost) GetAllJobPosts(ctx *gin.Context) {
+	jobPosts, err := j.jobPostModule.GetAllJobPosts(ctx)
+	if err != nil {
+		j.log.Error("failed to get job posts", zap.Error(err))
+		response.SendError(ctx, http.StatusInternalServerError, "internal server error", nil)
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Envelope[[]dto.GetAllJobPostsResponse]{Data: jobPosts})
+}

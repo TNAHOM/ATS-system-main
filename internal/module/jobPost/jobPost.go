@@ -2,11 +2,13 @@ package jobpost
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/TNAHOM/ATS-system-main/internal/constants/dto"
 	"github.com/TNAHOM/ATS-system-main/internal/module"
 	"github.com/TNAHOM/ATS-system-main/internal/storage"
 	"github.com/TNAHOM/ATS-system-main/platform/ai"
+	"github.com/TNAHOM/ATS-system-main/platform/encryption"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
@@ -27,17 +29,37 @@ func (j *JobPost) CreateJobPost(ctx context.Context, jobPost dto.CreateJobPostRe
 		return dto.CreateJobPostResponse{}, err
 	}
 
-	descriptionEmbedding, err := ai.Embedding(ctx, client, jobPost.Description)
+	claimsVal := ctx.Value("claims")
+	if claimsVal == nil {
+		j.log.Error("claims not found in context")
+		return dto.CreateJobPostResponse{}, fmt.Errorf("invalid token")
+	}
+
+	userClaims, ok := claimsVal.(*encryption.SignedDetails)
+	if !ok {
+		j.log.Error("claims type assertion failed")
+		return dto.CreateJobPostResponse{}, fmt.Errorf("invalid token")
+	}
+
+	jobPost.ID = uuid.New().String()
+	uid, err := uuid.Parse(userClaims.ID)
+	if err != nil {
+		j.log.Error("Failed to parse userClaims.ID to uuid.UUID", zap.Error(err))
+		return dto.CreateJobPostResponse{}, fmt.Errorf("invalid user ID format: %w", err)
+	}
+	jobPost.UserID = uid
+
+	descriptionEmbedding, err := ai.Embedding(ctx, client, []string{jobPost.Description})
 	if err != nil {
 		j.log.Error("Failed to generate description embedding", zap.Error(err))
 		return dto.CreateJobPostResponse{}, err
 	}
-	responsibilityEmbedding, err := ai.Embedding(ctx, client, jobPost.Responsibilities[])
+	responsibilityEmbedding, err := ai.Embedding(ctx, client, jobPost.Responsibilities)
 	if err != nil {
 		j.log.Error("Failed to generate responsibility embedding", zap.Error(err))
 		return dto.CreateJobPostResponse{}, err
 	}
-	requirementEmbedding, err := ai.Embedding(ctx, client, jobPost.Requirements[])
+	requirementEmbedding, err := ai.Embedding(ctx, client, jobPost.Requirements)
 	if err != nil {
 		j.log.Error("Failed to generate requirement embedding", zap.Error(err))
 		return dto.CreateJobPostResponse{}, err
@@ -45,23 +67,32 @@ func (j *JobPost) CreateJobPost(ctx context.Context, jobPost dto.CreateJobPostRe
 
 	jobPost.DescriptionEmbedding = descriptionEmbedding
 	jobPost.RequirementsEmbedding = requirementEmbedding
-	jobPost.ResponsibilitiesEmbedding= responsibilityEmbedding
+	jobPost.ResponsibilitiesEmbedding = responsibilityEmbedding
 
-	jobPost.ID = uuid.New().String()
-
-	// Create the job post
 	res, err := j.jobPostStorage.CreateJobPost(ctx, jobPost)
+
 	if err != nil {
 		j.log.Error("Failed to create job post", zap.Error(err))
 		return dto.CreateJobPostResponse{}, err
 	}
 
 	return dto.CreateJobPostResponse{
-		ID:          res.ID,
-		Description: res.Description,
-		UserID:      res.UserID,
-		Deadline:    res.Deadline,
+		ID:               res.ID,
+		Title:            res.Title,
+		Description:      res.Description,
+		Responsibilities: res.Responsibilities,
+		Requirements:     res.Requirements,
+		UserID:           res.UserID,
+		Deadline:         res.Deadline,
 	}, nil
 }
 
 // func GetAllJobPosts() {}
+func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetAllJobPostsResponse, error) {
+	jobPosts, err := j.jobPostStorage.GetAllJobPosts(ctx)
+	if err != nil {
+		j.log.Error("failed to get all job posts", zap.Error(err))
+		return nil, err
+	}
+	return jobPosts, nil
+}

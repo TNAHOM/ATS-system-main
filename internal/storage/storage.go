@@ -17,4 +17,5 @@ type Users interface {
 
 type JobPosts interface {
 	CreateJobPost(ctx context.Context, jobPost dto.CreateJobPostRequest) (dto.CreateJobPostResponse, error)
+	GetAllJobPosts(ctx context.Context) ([]dto.GetAllJobPostsResponse, error)
 }

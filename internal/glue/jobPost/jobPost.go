@@ -33,6 +33,14 @@ func Init(
 				middleware.AuthMiddleware(log),
 			},
 		},
+		{
+			Method:  http.MethodPatch,
+			Path:    "/jobPost/update/:id",
+			Handler: jobPostHandler.UpdateJobPost,
+			Middleware: []gin.HandlerFunc{
+				middleware.AuthMiddleware(log),
+			},
+		},
 	}
 	routing.RegisterRoute(group, jobPostRoutes, log)
 }

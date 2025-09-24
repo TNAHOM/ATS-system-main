@@ -47,3 +47,26 @@ func (j *jobPost) GetAllJobPosts(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, dto.Envelope[[]dto.GetAllJobPostsResponse]{Data: jobPosts})
 }
+
+func (j *jobPost) UpdateJobPost(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	if id == "" {
+		response.SendError(ctx, http.StatusBadRequest, "missing id", nil)
+		return
+	}
+	var req dto.UpdateJobPostRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		j.log.Error("invalid update payload", zap.Error(err))
+		response.SendError(ctx, http.StatusBadRequest, "validation failed", err)
+		return
+	}
+	req.ID = id
+	updated, err := j.jobPostModule.UpdateJobPost(ctx, req)
+	if err != nil {
+		j.log.Error("failed to update job post", zap.Error(err))
+		response.SendError(ctx, http.StatusInternalServerError, "internal server error", nil)
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Envelope[dto.UpdateJobPostResponse]{Data: updated})
+}

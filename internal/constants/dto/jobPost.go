@@ -33,8 +33,31 @@ type CreateJobPostResponse struct {
 	// CreatedAt   time.Time `json:"created_at"`
 }
 
-// GetAllJobPostsResponse represents a single job post in list responses
 type GetAllJobPostsResponse struct {
+	ID               string    `json:"id"`
+	Title            string    `json:"title"`
+	Description      string    `json:"description"`
+	Responsibilities []string  `json:"responsibilities"`
+	Requirements     []string  `json:"requirements"`
+	UserID           uuid.UUID `json:"user_id"`
+	Deadline         time.Time `json:"deadline"`
+}
+
+// UpdateJobPostRequest supports partial updates; omitted fields are ignored.
+type UpdateJobPostRequest struct {
+	ID               string     `json:"id"`
+	Title            *string    `json:"title,omitempty"`
+	Description      *string    `json:"description,omitempty"`
+	Deadline         *time.Time `json:"deadline,omitempty"`
+	Responsibilities *[]string  `json:"responsibilities,omitempty"`
+	Requirements     *[]string  `json:"requirements,omitempty"`
+
+	DescriptionEmbedding      *pgvector.Vector `json:"-"`
+	RequirementsEmbedding     *pgvector.Vector `json:"-"`
+	ResponsibilitiesEmbedding *pgvector.Vector `json:"-"`
+}
+
+type UpdateJobPostResponse struct {
 	ID               string    `json:"id"`
 	Title            string    `json:"title"`
 	Description      string    `json:"description"`

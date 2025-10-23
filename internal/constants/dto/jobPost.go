@@ -17,9 +17,9 @@ type CreateJobPostRequest struct {
 	Responsibilities []string `json:"responsibilities" binding:"required,dive,required"`
 	Requirements     []string `json:"requirements" binding:"required,dive,required"`
 
-	DescriptionEmbedding      pgvector.Vector `json:"description_embedding"`
-	RequirementsEmbedding     pgvector.Vector `json:"requirements_embedding"`
-	ResponsibilitiesEmbedding pgvector.Vector `json:"responsibilities_embedding"`
+	DescriptionEmbedding      pgvector.Vector `json:"description_embedding" swaggerignore:"true"`
+	RequirementsEmbedding     pgvector.Vector `json:"requirements_embedding" swaggerignore:"true"`
+	ResponsibilitiesEmbedding pgvector.Vector `json:"responsibilities_embedding" swaggerignore:"true"`
 }
 
 type CreateJobPostResponse struct {

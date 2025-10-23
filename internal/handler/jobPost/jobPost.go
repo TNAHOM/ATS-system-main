@@ -21,6 +21,17 @@ func Init(log *zap.Logger, jobPostModule module.JobPost) handler.JobPost {
 	return &jobPost{log: log, jobPostModule: jobPostModule}
 }
 
+// CreateJobPost godoc
+// @Summary Create a job post
+// @Tags JobPost
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param data body dto.CreateJobPostRequest true "Create job post payload"
+// @Success 200 {object} dto.EnvelopeCreateJobPostResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /jobPost/create [post]
 func (j *jobPost) CreateJobPost(ctx *gin.Context) {
 	var jobPostModel dto.CreateJobPostRequest
 	if err := ctx.ShouldBindJSON(&jobPostModel); err != nil {
@@ -39,6 +50,15 @@ func (j *jobPost) CreateJobPost(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto.Envelope[dto.CreateJobPostResponse]{Data: res})
 }
 
+// GetAllJobPosts godoc
+// @Summary List all job posts
+// @Tags JobPost
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} dto.EnvelopeGetAllJobPostsResponse
+// @Failure 401 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /jobPost/getAllJobPosts [get]
 func (j *jobPost) GetAllJobPosts(ctx *gin.Context) {
 	jobPosts, err := j.jobPostModule.GetAllJobPosts(ctx)
 	if err != nil {
@@ -49,6 +69,19 @@ func (j *jobPost) GetAllJobPosts(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto.Envelope[[]dto.GetAllJobPostsResponse]{Data: jobPosts})
 }
 
+// UpdateJobPost godoc
+// @Summary Update a job post (partial)
+// @Tags JobPost
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Job post ID"
+// @Param data body dto.UpdateJobPostRequest true "Update job post payload"
+// @Success 200 {object} dto.EnvelopeUpdateJobPostResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 401 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /jobPost/update/{id} [patch]
 func (j *jobPost) UpdateJobPost(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
@@ -75,6 +108,17 @@ func (j *jobPost) UpdateJobPost(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto.Envelope[dto.UpdateJobPostResponse]{Data: updated})
 }
 
+// DeleteJobPost godoc
+// @Summary Delete a job post
+// @Tags JobPost
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Job post ID"
+// @Success 200 {object} dto.EnvelopeAny
+// @Failure 401 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /jobPost/{id} [delete]
 func (j *jobPost) DeleteJobPost(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {

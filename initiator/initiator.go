@@ -49,7 +49,8 @@ func Initiator() {
 	// server.Use(middleware.GinLogger(*logger))
 	// server.Use(middleware.CORS())
 	// server.Use(middleware.ErrorHandler())
-	ginsrv := server.Group("api")
+	// Mount all routes under /api
+	ginsrv := server.Group("/api")
 
 	// initializing route which handle route endpoints
 	logger.Info("initializing route")
@@ -60,12 +61,17 @@ func Initiator() {
 		http.DefaultServeMux.ServeHTTP(w, r)
 	}))
 
+	logger.Info("initialize swagger")
+	InitSwagger(ginsrv)
+
 	logger.Info("initializing server")
 	srv := &http.Server{
 		Addr:              fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT")),
 		Handler:           server,
-		ReadHeaderTimeout: 10000,
-		IdleTimeout:       30 * time.Minute,
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       30 * time.Second,
+		WriteTimeout:      60 * time.Second,
+		IdleTimeout:       2 * time.Minute,
 	}
 	go func() {
 		sigint := make(chan os.Signal, 1)

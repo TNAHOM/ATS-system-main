@@ -19,6 +19,16 @@ func Init(log *zap.Logger, userModule module.User) handler.User {
 	return &user{log: log, userModule: userModule}
 }
 
+// SignUp godoc
+// @Summary Sign up user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param data body dto.CreateUserRequest true "Sign up payload"
+// @Success 200 {object} dto.EnvelopeCreateUserResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /auth/signup [post]
 func (u *user) SignUp(ctx *gin.Context) {
 	var userModel dto.CreateUserRequest
 	if err := ctx.ShouldBindJSON(&userModel); err != nil {
@@ -36,6 +46,16 @@ func (u *user) SignUp(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto.Envelope[dto.CreateUserResponse]{Data: res})
 }
 
+// LoginUser godoc
+// @Summary Login user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param data body dto.LoginUserRequest true "Login payload"
+// @Success 200 {object} dto.EnvelopeLoginUserResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /auth/login [post]
 func (u *user) LoginUser(ctx *gin.Context) {
 	var loginModel dto.LoginUserRequest
 	if err := ctx.ShouldBindJSON(&loginModel); err != nil {
@@ -54,6 +74,16 @@ func (u *user) LoginUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto.Envelope[dto.LoginUserResponse]{Data: loginRes})
 }
 
+// GetAllUsers godoc
+// @Summary List all users (admin only)
+// @Tags Users
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} dto.EnvelopeGetAllUsersResponse
+// @Failure 401 {object} dto.ErrorResponse
+// @Failure 403 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /user/getAllUsers [get]
 func (u *user) GetAllUsers(ctx *gin.Context) {
 	users, err := u.userModule.GetAllUsers(ctx)
 	if err != nil {

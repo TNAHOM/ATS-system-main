@@ -1,0 +1,496 @@
+basePath: /api
+definitions:
+  dto.CreateJobPostRequest:
+    properties:
+      deadline:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      requirements:
+        items:
+          type: string
+        type: array
+      responsibilities:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      user_id:
+        type: string
+    required:
+    - deadline
+    - description
+    - requirements
+    - responsibilities
+    - title
+    type: object
+  dto.CreateJobPostResponse:
+    properties:
+      deadline:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      requirements:
+        items:
+          type: string
+        type: array
+      responsibilities:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      user_id:
+        type: string
+    type: object
+  dto.CreateUserRequest:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      refresh_token:
+        type: string
+      token:
+        type: string
+      updated_at:
+        type: string
+      user_type:
+        type: string
+    type: object
+  dto.CreateUserResponse:
+    properties:
+      email:
+        description: Password  string `json:"password"`
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      phone:
+        type: string
+      refresh_token:
+        type: string
+      token:
+        type: string
+      user_type:
+        type: string
+    type: object
+  dto.EnvelopeAny:
+    properties:
+      data: {}
+      error:
+        type: string
+    type: object
+  dto.EnvelopeCreateJobPostResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.CreateJobPostResponse'
+      error:
+        type: string
+    type: object
+  dto.EnvelopeCreateUserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.CreateUserResponse'
+      error:
+        type: string
+    type: object
+  dto.EnvelopeGetAllJobPostsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.GetAllJobPostsResponse'
+        type: array
+      error:
+        type: string
+    type: object
+  dto.EnvelopeGetAllUsersResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.GetAllUsers'
+        type: array
+      error:
+        type: string
+    type: object
+  dto.EnvelopeLoginUserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.LoginUserResponse'
+      error:
+        type: string
+    type: object
+  dto.EnvelopeUpdateJobPostResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.UpdateJobPostResponse'
+      error:
+        type: string
+    type: object
+  dto.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      details: {}
+      message:
+        type: string
+    type: object
+  dto.GetAllJobPostsResponse:
+    properties:
+      deadline:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      requirements:
+        items:
+          type: string
+        type: array
+      responsibilities:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      user_id:
+        type: string
+    type: object
+  dto.GetAllUsers:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      phone:
+        type: string
+      user_type:
+        type: string
+    type: object
+  dto.LoginUserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  dto.LoginUserResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      refresh_token:
+        type: string
+      token:
+        type: string
+      updated_at:
+        type: string
+      user_type:
+        type: string
+    type: object
+  dto.UpdateJobPostRequest:
+    properties:
+      deadline:
+        type: string
+      description:
+        minLength: 1
+        type: string
+      id:
+        type: string
+      requirements:
+        items:
+          type: string
+        minItems: 1
+        type: array
+      responsibilities:
+        items:
+          type: string
+        minItems: 1
+        type: array
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - requirements
+    - responsibilities
+    type: object
+  dto.UpdateJobPostResponse:
+    properties:
+      deadline:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      requirements:
+        items:
+          type: string
+        type: array
+      responsibilities:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      user_id:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact: {}
+  description: REST API for ATS-system-main (users, auth, job posts)
+  title: ATS System API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Login payload
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EnvelopeLoginUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Login user
+      tags:
+      - Auth
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Sign up payload
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EnvelopeCreateUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Sign up user
+      tags:
+      - Auth
+  /jobPost/{id}:
+    delete:
+      parameters:
+      - description: Job post ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EnvelopeAny'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a job post
+      tags:
+      - JobPost
+  /jobPost/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Create job post payload
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateJobPostRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EnvelopeCreateJobPostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a job post
+      tags:
+      - JobPost
+  /jobPost/getAllJobPosts:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EnvelopeGetAllJobPostsResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List all job posts
+      tags:
+      - JobPost
+  /jobPost/update/{id}:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Job post ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update job post payload
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateJobPostRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EnvelopeUpdateJobPostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a job post (partial)
+      tags:
+      - JobPost
+  /user/getAllUsers:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EnvelopeGetAllUsersResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List all users (admin only)
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

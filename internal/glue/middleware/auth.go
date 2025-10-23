@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -49,6 +50,8 @@ func AuthMiddleware(log *zap.Logger) gin.HandlerFunc {
 func AuthUserTypeMiddleware(log *zap.Logger, userType string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		setUserType := ctx.GetString("user_type")
+		// console.log
+		fmt.Println("setUserType:", setUserType)
 
 		if userType != setUserType {
 			log.Error("userType not allowed", zap.Any("request", userType))

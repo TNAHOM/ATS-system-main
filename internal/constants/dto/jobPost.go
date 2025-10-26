@@ -33,14 +33,17 @@ type CreateJobPostResponse struct {
 	// CreatedAt   time.Time `json:"created_at"`
 }
 
-type GetAllJobPostsResponse struct {
+type GetJobPostsResponse struct {
 	ID               string    `json:"id"`
 	Title            string    `json:"title"`
 	Description      string    `json:"description"`
 	Responsibilities []string  `json:"responsibilities"`
 	Requirements     []string  `json:"requirements"`
 	UserID           uuid.UUID `json:"user_id"`
+	ApplicantCount   int       `json:"applicant_count"`
 	Deadline         time.Time `json:"deadline"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 }
 
 // UpdateJobPostRequest supports partial updates; omitted fields are ignored.
@@ -64,5 +67,8 @@ type UpdateJobPostResponse struct {
 	Responsibilities []string  `json:"responsibilities"`
 	Requirements     []string  `json:"requirements"`
 	UserID           uuid.UUID `json:"user_id"`
+	ApplicantCount   int       `json:"applicant_count"`
 	Deadline         time.Time `json:"deadline"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 }

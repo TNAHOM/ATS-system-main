@@ -12,6 +12,7 @@ type User interface {
 type JobPost interface {
 	CreateJobPost(ctx *gin.Context)
 	GetAllJobPosts(ctx *gin.Context)
+	GetJobPostByID(ctx *gin.Context)
 	UpdateJobPost(ctx *gin.Context)
 	DeleteJobPost(ctx *gin.Context)
 }

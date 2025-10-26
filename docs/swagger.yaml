@@ -113,20 +113,20 @@ definitions:
       error:
         type: string
     type: object
-  dto.EnvelopeGetAllJobPostsResponse:
-    properties:
-      data:
-        items:
-          $ref: '#/definitions/dto.GetAllJobPostsResponse'
-        type: array
-      error:
-        type: string
-    type: object
   dto.EnvelopeGetAllUsersResponse:
     properties:
       data:
         items:
           $ref: '#/definitions/dto.GetAllUsers'
+        type: array
+      error:
+        type: string
+    type: object
+  dto.EnvelopeGetJobPostsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.GetJobPostsResponse'
         type: array
       error:
         type: string
@@ -153,8 +153,27 @@ definitions:
       message:
         type: string
     type: object
-  dto.GetAllJobPostsResponse:
+  dto.GetAllUsers:
     properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      phone:
+        type: string
+      user_type:
+        type: string
+    type: object
+  dto.GetJobPostsResponse:
+    properties:
+      applicant_count:
+        type: integer
+      created_at:
+        type: string
       deadline:
         type: string
       description:
@@ -171,22 +190,9 @@ definitions:
         type: array
       title:
         type: string
+      updated_at:
+        type: string
       user_id:
-        type: string
-    type: object
-  dto.GetAllUsers:
-    properties:
-      email:
-        type: string
-      first_name:
-        type: string
-      id:
-        type: string
-      last_name:
-        type: string
-      phone:
-        type: string
-      user_type:
         type: string
     type: object
   dto.LoginUserRequest:
@@ -250,6 +256,10 @@ definitions:
     type: object
   dto.UpdateJobPostResponse:
     properties:
+      applicant_count:
+        type: integer
+      created_at:
+        type: string
       deadline:
         type: string
       description:
@@ -265,6 +275,8 @@ definitions:
           type: string
         type: array
       title:
+        type: string
+      updated_at:
         type: string
       user_id:
         type: string
@@ -408,7 +420,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.EnvelopeGetAllJobPostsResponse'
+            $ref: '#/definitions/dto.EnvelopeGetJobPostsResponse'
         "401":
           description: Unauthorized
           schema:
@@ -420,6 +432,38 @@ paths:
       security:
       - BearerAuth: []
       summary: List all job posts
+      tags:
+      - JobPost
+  /jobPost/getJobPostByID/{id}:
+    get:
+      parameters:
+      - description: Job post ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EnvelopeGetJobPostsResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get a job post by ID
       tags:
       - JobPost
   /jobPost/update/{id}:

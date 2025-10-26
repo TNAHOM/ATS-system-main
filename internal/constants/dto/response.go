@@ -6,9 +6,9 @@ type Envelope[T any] struct {
 }
 
 type ErrorResponse struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Details interface{} `json:"details,omitempty"`
+	Code         int         `json:"code"`
+	ErrorMessage string      `json:"errorMessage"`
+	Details      interface{} `json:"details,omitempty"`
 }
 
 // --- Swagger helper envelope types (doc-only) ---
@@ -38,9 +38,9 @@ type EnvelopeCreateJobPostResponse struct {
 	Error string                `json:"error,omitempty"`
 }
 
-type EnvelopeGetAllJobPostsResponse struct {
-	Data  []GetAllJobPostsResponse `json:"data,omitempty"`
-	Error string                   `json:"error,omitempty"`
+type EnvelopeGetJobPostsResponse struct {
+	Data  []GetJobPostsResponse `json:"data,omitempty"`
+	Error string                `json:"error,omitempty"`
 }
 
 type EnvelopeUpdateJobPostResponse struct {

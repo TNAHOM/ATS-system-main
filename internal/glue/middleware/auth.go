@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -10,6 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
+
+// contextKey avoids collisions when storing values in context.Context
+type contextKey string
+
+const claimsCtxKey contextKey = "claims"
 
 func AuthMiddleware(log *zap.Logger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -39,9 +43,25 @@ func AuthMiddleware(log *zap.Logger) gin.HandlerFunc {
 		}
 
 		ctx.Set("claims", claims)
+		// expose common fields for downstream middlewares/handlers
+		ctx.Set("UserType", claims.UserType)
+		ctx.Set("UserID", claims.ID)
+
+		claimsValue, exists := ctx.Get("claims")
+		if !exists {
+			log.Error("claims not found in context")
+		} else {
+			// It's good practice to type assert the claims to their expected type
+			claims, ok := claimsValue.(*encryption.SignedDetails)
+			if !ok {
+				log.Error("claims type assertion failed")
+			} else {
+				log.Info("claims print", zap.Any("claims", claims))
+			}
+		}
 
 		// also put claims into the http request's context so downstream modules receiving context.Context can access it
-		reqCtx := context.WithValue(ctx.Request.Context(), "claims", claims)
+		reqCtx := context.WithValue(ctx.Request.Context(), claimsCtxKey, claims)
 		ctx.Request = ctx.Request.WithContext(reqCtx)
 		ctx.Next()
 	}
@@ -49,12 +69,10 @@ func AuthMiddleware(log *zap.Logger) gin.HandlerFunc {
 
 func AuthUserTypeMiddleware(log *zap.Logger, userType string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		setUserType := ctx.GetString("user_type")
-		// console.log
-		fmt.Println("setUserType:", setUserType)
+		setUserType := ctx.GetString("UserType")
 
 		if userType != setUserType {
-			log.Error("userType not allowed", zap.Any("request", userType))
+			log.Error("userType not allowed", zap.Any("userType request", userType))
 			ctx.JSON(http.StatusForbidden, gin.H{"error": "user type not allowed"})
 
 			ctx.Abort()

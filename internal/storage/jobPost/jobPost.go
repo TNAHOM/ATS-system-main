@@ -50,16 +50,17 @@ func (j *JobPost) CreateJobPost(ctx context.Context, jobPost dto.CreateJobPostRe
 	}, nil
 }
 
-func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetAllJobPostsResponse, error) {
+func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetJobPostsResponse, error) {
 	var jobPosts []models.JobPost
+
 	if err := j.db.WithContext(ctx).Find(&jobPosts).Error; err != nil {
 		j.log.Error("failed to fetch job posts", zap.Error(err))
 		return nil, err
 	}
 
-	res := make([]dto.GetAllJobPostsResponse, len(jobPosts))
+	res := make([]dto.GetJobPostsResponse, len(jobPosts))
 	for i, jp := range jobPosts {
-		res[i] = dto.GetAllJobPostsResponse{
+		res[i] = dto.GetJobPostsResponse{
 			ID:               jp.ID,
 			Title:            jp.Title,
 			Description:      jp.Description,
@@ -67,18 +68,21 @@ func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetAllJobPostsRespo
 			Requirements:     jp.Requirements,
 			UserID:           jp.UserID,
 			Deadline:         jp.Deadline,
+			CreatedAt:        jp.CreatedAt,
+			UpdatedAt:        jp.UpdatedAt,
+			ApplicantCount:   jp.ApplicantCount,
 		}
 	}
 	return res, nil
 }
 
-func (j *JobPost) GetJobPostByID(ctx context.Context, id string) (dto.UpdateJobPostResponse, error) {
+func (j *JobPost) GetJobPostByID(ctx context.Context, id string) (dto.GetJobPostsResponse, error) {
 	var jp models.JobPost
 	if err := j.db.WithContext(ctx).First(&jp, "id = ?", id).Error; err != nil {
 		j.log.Error("failed to get job post by id", zap.String("id", id), zap.Error(err))
-		return dto.UpdateJobPostResponse{}, err
+		return dto.GetJobPostsResponse{}, err
 	}
-	return dto.UpdateJobPostResponse{
+	return dto.GetJobPostsResponse{
 		ID:               jp.ID,
 		Title:            jp.Title,
 		Description:      jp.Description,
@@ -86,10 +90,13 @@ func (j *JobPost) GetJobPostByID(ctx context.Context, id string) (dto.UpdateJobP
 		Requirements:     jp.Requirements,
 		UserID:           jp.UserID,
 		Deadline:         jp.Deadline,
+		CreatedAt:        jp.CreatedAt,
+		UpdatedAt:        jp.UpdatedAt,
+		ApplicantCount:   jp.ApplicantCount,
 	}, nil
 }
 
-func (j *JobPost) UpdateJobPost(ctx context.Context, req dto.UpdateJobPostRequest) (dto.UpdateJobPostResponse, error) {
+func (j *JobPost) UpdateJobPost(ctx context.Context, req dto.UpdateJobPostRequest) (dto.GetJobPostsResponse, error) {
 	// Build map of fields to update
 	updates := map[string]interface{}{}
 	if req.Title != nil {
@@ -125,7 +132,7 @@ func (j *JobPost) UpdateJobPost(ctx context.Context, req dto.UpdateJobPostReques
 
 	if err := j.db.WithContext(ctx).Model(&models.JobPost{}).Where("id = ?", req.ID).Updates(updates).Error; err != nil {
 		j.log.Error("failed updating job post", zap.String("id", req.ID), zap.Error(err))
-		return dto.UpdateJobPostResponse{}, err
+		return dto.GetJobPostsResponse{}, err
 	}
 
 	return j.GetJobPostByID(ctx, req.ID)

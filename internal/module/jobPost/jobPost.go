@@ -87,21 +87,31 @@ func (j *JobPost) CreateJobPost(ctx context.Context, jobPost dto.CreateJobPostRe
 	}, nil
 }
 
-// func GetAllJobPosts() {}
-func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetAllJobPostsResponse, error) {
+func (j *JobPost) GetJobPostByID(ctx context.Context, id string) (dto.GetJobPostsResponse, error) {
+	jobPost, err := j.jobPostStorage.GetJobPostByID(ctx, id)
+	if err != nil {
+		j.log.Error("failed to get job post by id", zap.Error(err))
+		return dto.GetJobPostsResponse{}, err
+	}
+
+	return jobPost, nil
+}
+
+func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetJobPostsResponse, error) {
 	jobPosts, err := j.jobPostStorage.GetAllJobPosts(ctx)
 	if err != nil {
 		j.log.Error("failed to get all job posts", zap.Error(err))
 		return nil, err
 	}
+
 	return jobPosts, nil
 }
 
-func (j *JobPost) UpdateJobPost(ctx context.Context, req dto.UpdateJobPostRequest) (dto.UpdateJobPostResponse, error) {
+func (j *JobPost) UpdateJobPost(ctx context.Context, req dto.UpdateJobPostRequest) (dto.GetJobPostsResponse, error) {
 	// Get current record
 	existing, err := j.jobPostStorage.GetJobPostByID(ctx, req.ID)
 	if err != nil {
-		return dto.UpdateJobPostResponse{}, err
+		return dto.GetJobPostsResponse{}, err
 	}
 
 	// Determine which textual fields changed to decide on embedding regeneration
@@ -138,26 +148,26 @@ func (j *JobPost) UpdateJobPost(ctx context.Context, req dto.UpdateJobPostReques
 		client, err := ai.NewClient(ctx)
 		if err != nil {
 			j.log.Error("failed to init ai client", zap.Error(err))
-			return dto.UpdateJobPostResponse{}, err
+			return dto.GetJobPostsResponse{}, err
 		}
 		if needDescEmbed {
 			emb, err := ai.Embedding(ctx, client, []string{*req.Description})
 			if err != nil {
-				return dto.UpdateJobPostResponse{}, err
+				return dto.GetJobPostsResponse{}, err
 			}
 			req.DescriptionEmbedding = &emb
 		}
 		if needRespEmbed {
 			emb, err := ai.Embedding(ctx, client, *req.Responsibilities)
 			if err != nil {
-				return dto.UpdateJobPostResponse{}, err
+				return dto.GetJobPostsResponse{}, err
 			}
 			req.ResponsibilitiesEmbedding = &emb
 		}
 		if needReqEmbed {
 			emb, err := ai.Embedding(ctx, client, *req.Requirements)
 			if err != nil {
-				return dto.UpdateJobPostResponse{}, err
+				return dto.GetJobPostsResponse{}, err
 			}
 			req.RequirementsEmbedding = &emb
 		}
@@ -165,7 +175,7 @@ func (j *JobPost) UpdateJobPost(ctx context.Context, req dto.UpdateJobPostReques
 
 	updated, err := j.jobPostStorage.UpdateJobPost(ctx, req)
 	if err != nil {
-		return dto.UpdateJobPostResponse{}, err
+		return dto.GetJobPostsResponse{}, err
 	}
 	return updated, nil
 }

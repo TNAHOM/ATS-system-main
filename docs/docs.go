@@ -173,11 +173,62 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.EnvelopeGetAllJobPostsResponse"
+                            "$ref": "#/definitions/dto.EnvelopeGetJobPostsResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/jobPost/getJobPostByID/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "JobPost"
+                ],
+                "summary": "Get a job post by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Job post ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EnvelopeGetJobPostsResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
@@ -519,20 +570,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.EnvelopeGetAllJobPostsResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.GetAllJobPostsResponse"
-                    }
-                },
-                "error": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.EnvelopeGetAllUsersResponse": {
             "type": "object",
             "properties": {
@@ -540,6 +577,20 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dto.GetAllUsers"
+                    }
+                },
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.EnvelopeGetJobPostsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GetJobPostsResponse"
                     }
                 },
                 "error": {
@@ -581,9 +632,38 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.GetAllJobPostsResponse": {
+        "dto.GetAllUsers": {
             "type": "object",
             "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "user_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GetJobPostsResponse": {
+            "type": "object",
+            "properties": {
+                "applicant_count": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
                 "deadline": {
                     "type": "string"
                 },
@@ -608,30 +688,10 @@ const docTemplate = `{
                 "title": {
                     "type": "string"
                 },
+                "updated_at": {
+                    "type": "string"
+                },
                 "user_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.GetAllUsers": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "user_type": {
                     "type": "string"
                 }
             }
@@ -726,6 +786,12 @@ const docTemplate = `{
         "dto.UpdateJobPostResponse": {
             "type": "object",
             "properties": {
+                "applicant_count": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
                 "deadline": {
                     "type": "string"
                 },
@@ -748,6 +814,9 @@ const docTemplate = `{
                     }
                 },
                 "title": {
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 },
                 "user_id": {

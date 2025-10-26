@@ -18,18 +18,18 @@ func SendError(c *gin.Context, status int, message string, err interface{}) {
 			details[fe.Field()] = fe.Tag()
 		}
 		c.AbortWithStatusJSON(status, dto.ErrorResponse{
-			Code:    status,
-			Message: message,
-			Details: details,
+			Code:         status,
+			ErrorMessage: message,
+			Details:      details,
 		})
 		return
 	}
 
 	// Default (non-validation errors)
 	c.AbortWithStatusJSON(status, dto.ErrorResponse{
-		Code:    status,
-		Message: message,
-		Details: err,
+		Code:         status,
+		ErrorMessage: message,
+		Details:      err,
 	})
 }
 

@@ -20,6 +20,8 @@ type JobPost struct {
 	Responsibilities pq.StringArray `gorm:"type:text[]" json:"responsibilities"`
 	Requirements     pq.StringArray `gorm:"type:text[]" json:"requirements"`
 
+	ApplicantCount int `gorm:"default:0" json:"applicant_count"`
+
 	Deadline  time.Time      `json:"deadline"`
 	CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`

@@ -50,12 +50,42 @@ func (j *jobPost) CreateJobPost(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto.Envelope[dto.CreateJobPostResponse]{Data: res})
 }
 
+// GetJobPostByID godoc
+// @Summary Get a job post by ID
+// @Tags JobPost
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Job post ID"
+// @Success 200 {object} dto.EnvelopeGetJobPostsResponse
+// @Failure 401 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /jobPost/getJobPostByID/{id} [get]
+func (j *jobPost) GetJobPostByID(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id == "" {
+		response.SendError(ctx, http.StatusBadRequest, "missing id", nil)
+		return
+	}
+	jobPost, err := j.jobPostModule.GetJobPostByID(ctx, id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			response.SendError(ctx, http.StatusNotFound, "job post not found", nil)
+			return
+		}
+		j.log.Error("failed to get job post by id", zap.Error(err))
+		response.SendError(ctx, http.StatusInternalServerError, "internal server error", nil)
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Envelope[dto.GetJobPostsResponse]{Data: jobPost})
+}
+
 // GetAllJobPosts godoc
 // @Summary List all job posts
 // @Tags JobPost
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} dto.EnvelopeGetAllJobPostsResponse
+// @Success 200 {object} dto.EnvelopeGetJobPostsResponse
 // @Failure 401 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /jobPost/getAllJobPosts [get]
@@ -66,7 +96,7 @@ func (j *jobPost) GetAllJobPosts(ctx *gin.Context) {
 		response.SendError(ctx, http.StatusInternalServerError, "internal server error", nil)
 		return
 	}
-	ctx.JSON(http.StatusOK, dto.Envelope[[]dto.GetAllJobPostsResponse]{Data: jobPosts})
+	ctx.JSON(http.StatusOK, dto.Envelope[[]dto.GetJobPostsResponse]{Data: jobPosts})
 }
 
 // UpdateJobPost godoc
@@ -105,7 +135,7 @@ func (j *jobPost) UpdateJobPost(ctx *gin.Context) {
 		response.SendError(ctx, http.StatusInternalServerError, "internal server error", nil)
 		return
 	}
-	ctx.JSON(http.StatusOK, dto.Envelope[dto.UpdateJobPostResponse]{Data: updated})
+	ctx.JSON(http.StatusOK, dto.Envelope[dto.GetJobPostsResponse]{Data: updated})
 }
 
 // DeleteJobPost godoc

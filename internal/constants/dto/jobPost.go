@@ -8,7 +8,7 @@ import (
 )
 
 type CreateJobPostRequest struct {
-	ID          string    `json:"id"`
+	ID string `json:"id"`
 	UserID      uuid.UUID `json:"user_id"`
 	Title       string    `json:"title" binding:"required"`
 	Description string    `json:"description" binding:"required"`

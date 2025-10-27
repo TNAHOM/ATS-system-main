@@ -21,6 +21,7 @@ func Init(log *zap.Logger, db *gorm.DB) storage.JobPosts {
 }
 
 func (j *JobPost) CreateJobPost(ctx context.Context, jobPost dto.CreateJobPostRequest) (dto.CreateJobPostResponse, error) {
+
 	params := models.JobPost{
 		ID:               jobPost.ID,
 		Title:            jobPost.Title,
@@ -52,8 +53,13 @@ func (j *JobPost) CreateJobPost(ctx context.Context, jobPost dto.CreateJobPostRe
 
 func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetJobPostsResponse, error) {
 	var jobPosts []models.JobPost
+	userId, err := ctx.Value("UserID").(string)
+	if !err {
+		j.log.Error("UserID not found in context")
+		return nil, gorm.ErrInvalidData
+	}
 
-	if err := j.db.WithContext(ctx).Find(&jobPosts).Error; err != nil {
+	if err := j.db.WithContext(ctx).Find(&jobPosts, "user_id = ?", userId).Error; err != nil {
 		j.log.Error("failed to fetch job posts", zap.Error(err))
 		return nil, err
 	}
@@ -72,6 +78,9 @@ func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetJobPostsResponse
 			UpdatedAt:        jp.UpdatedAt,
 			ApplicantCount:   jp.ApplicantCount,
 		}
+	}
+	if len(res) == 0 {
+		return []dto.GetJobPostsResponse{}, nil
 	}
 	return res, nil
 }

@@ -8,9 +8,9 @@ import (
 	"github.com/TNAHOM/ATS-system-main/internal/module"
 	"github.com/TNAHOM/ATS-system-main/internal/storage"
 	"github.com/TNAHOM/ATS-system-main/platform/ai"
-	"github.com/TNAHOM/ATS-system-main/platform/encryption"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 type JobPost struct {
@@ -35,19 +35,25 @@ func (j *JobPost) CreateJobPost(ctx context.Context, jobPost dto.CreateJobPostRe
 		return dto.CreateJobPostResponse{}, fmt.Errorf("invalid token")
 	}
 
-	userClaims, ok := claimsVal.(*encryption.SignedDetails)
-	if !ok {
-		j.log.Error("claims type assertion failed")
-		return dto.CreateJobPostResponse{}, fmt.Errorf("invalid token")
-	}
+	// userClaims, ok := claimsVal.(*encryption.SignedDetails)
+	// if !ok {
+	// 	j.log.Error("claims type assertion failed")
+	// 	return dto.CreateJobPostResponse{}, fmt.Errorf("invalid token")
+	// }
 
 	jobPost.ID = uuid.New().String()
-	uid, err := uuid.Parse(userClaims.ID)
+	// uid, err := uuid.Parse(userClaims.ID)
+	// if err != nil {
+	// 	j.log.Error("Failed to parse userClaims.ID to uuid.UUID", zap.Error(err))
+	// 	return dto.CreateJobPostResponse{}, fmt.Errorf("invalid user ID format: %w", err)
+	// }
+
+	userId, err := uuid.Parse(ctx.Value("UserID").(string))
 	if err != nil {
-		j.log.Error("Failed to parse userClaims.ID to uuid.UUID", zap.Error(err))
-		return dto.CreateJobPostResponse{}, fmt.Errorf("invalid user ID format: %w", err)
+		j.log.Error("UserID not found in context")
+		return dto.CreateJobPostResponse{}, gorm.ErrInvalidData
 	}
-	jobPost.UserID = uid
+	jobPost.UserID = userId
 
 	descriptionEmbedding, err := ai.Embedding(ctx, client, []string{jobPost.Description})
 	if err != nil {

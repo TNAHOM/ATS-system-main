@@ -17,8 +17,15 @@ type Users interface {
 
 type JobPosts interface {
 	CreateJobPost(ctx context.Context, jobPost dto.CreateJobPostRequest) (dto.CreateJobPostResponse, error)
+	GetAllJobPostsByUserId(ctx context.Context) ([]dto.GetJobPostsResponse, error)
 	GetAllJobPosts(ctx context.Context) ([]dto.GetJobPostsResponse, error)
+
 	GetJobPostByID(ctx context.Context, id string) (dto.GetJobPostsResponse, error)
 	UpdateJobPost(ctx context.Context, req dto.UpdateJobPostRequest) (dto.GetJobPostsResponse, error)
 	DeleteJobPost(ctx context.Context, id string) error
+}
+
+type Application interface {
+	// GetApplicationsByApplicantID(ctx context.Context, applicantID string) ([]dto.GetApplicationsResponse, error)
+	GetApplicationsByJobPostID(ctx context.Context, jobPostID string) ([]dto.GetApplicationsResponse, error)
 }

@@ -80,6 +80,25 @@ func (j *jobPost) GetJobPostByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto.Envelope[dto.GetJobPostsResponse]{Data: jobPost})
 }
 
+// GetAllJobPostsByUserId godoc
+// @Summary List all job posts
+// @Tags JobPost
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} dto.EnvelopeGetJobPostsResponse
+// @Failure 401 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /jobPost/getAllJobPostsByUserId [get]
+func (j *jobPost) GetAllJobPostsByUserId(ctx *gin.Context) {
+	jobPosts, err := j.jobPostModule.GetAllJobPostsByUserId(ctx)
+	if err != nil {
+		j.log.Error("failed to get job posts", zap.Error(err))
+		response.SendError(ctx, http.StatusInternalServerError, "internal server error", nil)
+		return
+	}
+	ctx.JSON(http.StatusOK, dto.Envelope[[]dto.GetJobPostsResponse]{Data: jobPosts})
+}
+
 // GetAllJobPosts godoc
 // @Summary List all job posts
 // @Tags JobPost
@@ -96,6 +115,7 @@ func (j *jobPost) GetAllJobPosts(ctx *gin.Context) {
 		response.SendError(ctx, http.StatusInternalServerError, "internal server error", nil)
 		return
 	}
+
 	ctx.JSON(http.StatusOK, dto.Envelope[[]dto.GetJobPostsResponse]{Data: jobPosts})
 }
 

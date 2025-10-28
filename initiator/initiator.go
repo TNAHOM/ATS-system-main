@@ -52,7 +52,6 @@ func Initiator() {
 	// Mount all routes under /api
 	ginsrv := server.Group("/api")
 
-	// initializing route which handle route endpoints
 	logger.Info("initializing route")
 	InitRoute(ginsrv, handler, module, logger)
 	logger.Info("done initializing route")

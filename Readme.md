@@ -1,6 +1,6 @@
 # ATS-system-main
 
-A modular Applicant Tracking System (ATS) backend written in Go, showcasing a clean DDD + hexagonal architecture with Gin, GORM (PostgreSQL), JWT auth, zap logging, and pgvector-powered AI embeddings for job posts.
+A modular Application Tracking System (ATS) backend written in Go, showcasing a clean DDD + hexagonal architecture with Gin, GORM (PostgreSQL), JWT auth, zap logging, and pgvector-powered AI embeddings for job posts.
 
 ## Highlights
 

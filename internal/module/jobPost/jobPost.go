@@ -103,6 +103,16 @@ func (j *JobPost) GetJobPostByID(ctx context.Context, id string) (dto.GetJobPost
 	return jobPost, nil
 }
 
+func (j *JobPost) GetAllJobPostsByUserId(ctx context.Context) ([]dto.GetJobPostsResponse, error) {
+	jobPosts, err := j.jobPostStorage.GetAllJobPostsByUserId(ctx)
+	if err != nil {
+		j.log.Error("failed to get all job posts", zap.Error(err))
+		return nil, err
+	}
+
+	return jobPosts, nil
+}
+
 func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetJobPostsResponse, error) {
 	jobPosts, err := j.jobPostStorage.GetAllJobPosts(ctx)
 	if err != nil {

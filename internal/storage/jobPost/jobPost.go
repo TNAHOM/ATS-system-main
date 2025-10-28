@@ -51,7 +51,7 @@ func (j *JobPost) CreateJobPost(ctx context.Context, jobPost dto.CreateJobPostRe
 	}, nil
 }
 
-func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetJobPostsResponse, error) {
+func (j *JobPost) GetAllJobPostsByUserId(ctx context.Context) ([]dto.GetJobPostsResponse, error) {
 	var jobPosts []models.JobPost
 	userId, err := ctx.Value("UserID").(string)
 	if !err {
@@ -81,6 +81,32 @@ func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetJobPostsResponse
 	}
 	if len(res) == 0 {
 		return []dto.GetJobPostsResponse{}, nil
+	}
+	return res, nil
+}
+
+func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetJobPostsResponse, error) {
+	var jobPosts []models.JobPost
+
+	if err := j.db.WithContext(ctx).Find(&jobPosts).Error; err != nil {
+		j.log.Error("failed to fetch job posts", zap.Error(err))
+		return nil, err
+	}
+
+	res := make([]dto.GetJobPostsResponse, len(jobPosts))
+	for i, jp := range jobPosts {
+		res[i] = dto.GetJobPostsResponse{
+			ID:               jp.ID,
+			Title:            jp.Title,
+			Description:      jp.Description,
+			Responsibilities: jp.Responsibilities,
+			Requirements:     jp.Requirements,
+			UserID:           jp.UserID,
+			Deadline:         jp.Deadline,
+			CreatedAt:        jp.CreatedAt,
+			UpdatedAt:        jp.UpdatedAt,
+			ApplicantCount:   jp.ApplicantCount,
+		}
 	}
 	return res, nil
 }

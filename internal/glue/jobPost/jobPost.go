@@ -27,10 +27,18 @@ func Init(
 		},
 		{
 			Method:  http.MethodGet,
-			Path:    "/jobPost/getAllJobPosts",
-			Handler: jobPostHandler.GetAllJobPosts,
+			Path:    "/jobPost/getAllJobPostsByUserId",
+			Handler: jobPostHandler.GetAllJobPostsByUserId,
 			Middleware: []gin.HandlerFunc{
 				middleware.AuthMiddleware(log),
+			},
+		},
+		{
+			Method:     http.MethodGet,
+			Path:       "/jobPost/getAllJobPosts",
+			Handler:    jobPostHandler.GetAllJobPosts,
+			Middleware: []gin.HandlerFunc{
+				// middleware.AuthMiddleware(log),
 			},
 		},
 		{
@@ -55,7 +63,7 @@ func Init(
 			Path:    "/jobPost/getJobPostByID/:id",
 			Handler: jobPostHandler.GetJobPostByID,
 			Middleware: []gin.HandlerFunc{
-				middleware.AuthMiddleware(log),
+				// middleware.AuthMiddleware(log),
 			},
 		},
 	}

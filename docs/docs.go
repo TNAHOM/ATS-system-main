@@ -15,6 +15,50 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/applications/jobPost/{jobPostID}": {
+            "get": {
+                "description": "Get applications by job post ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "applications"
+                ],
+                "summary": "Get applications by job post ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Job Post ID",
+                        "name": "jobPostID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EnvelopeGetApplicationsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "consumes": [
@@ -156,6 +200,42 @@ const docTemplate = `{
             }
         },
         "/jobPost/getAllJobPosts": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "JobPost"
+                ],
+                "summary": "List all job posts",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EnvelopeGetJobPostsResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/jobPost/getAllJobPostsByUserId": {
             "get": {
                 "security": [
                     {
@@ -584,6 +664,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.EnvelopeGetApplicationsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GetApplicationsResponse"
+                    }
+                },
+                "error": {
+                    "$ref": "#/definitions/dto.ErrorResponse"
+                }
+            }
+        },
         "dto.EnvelopeGetJobPostsResponse": {
             "type": "object",
             "properties": {
@@ -627,7 +721,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "details": {},
-                "message": {
+                "errorMessage": {
                     "type": "string"
                 }
             }
@@ -651,6 +745,38 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GetApplicationsResponse": {
+            "type": "object",
+            "properties": {
+                "analysis": {
+                    "type": "object"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "jobPostID": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "s3_path": {
+                    "type": "string"
+                },
+                "seniority_level": {
+                    "type": "string"
+                },
+                "status": {
                     "type": "string"
                 }
             }

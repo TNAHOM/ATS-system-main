@@ -1,6 +1,8 @@
 package initiator
 
 import (
+	aimicroservice "github.com/TNAHOM/ATS-system-main/internal/glue/aiMicroservice"
+	"github.com/TNAHOM/ATS-system-main/internal/glue/application"
 	jobpost "github.com/TNAHOM/ATS-system-main/internal/glue/jobPost"
 	"github.com/TNAHOM/ATS-system-main/internal/glue/user"
 	"github.com/gin-gonic/gin"
@@ -10,4 +12,7 @@ import (
 func InitRoute(grp *gin.RouterGroup, handler *Handler, module *Module, log *zap.Logger) {
 	user.Init(grp, log, handler.User)
 	jobpost.Init(grp, log, handler.JobPost)
+	aimicroservice.Init(grp, log)
+
+	application.Init(grp, log, handler.Application)
 }

@@ -37,16 +37,6 @@ func Init(
 				middleware.AuthUserTypeMiddleware(log, "admin"),
 			},
 		},
-		{
-			Method: http.MethodGet,
-			Path:   "/user/microservice",
-			// Handler: userHandler.GetAllUsers,
-			Middleware: []gin.HandlerFunc{
-				middleware.AuthMiddleware(log),
-				// middleware.AuthUserTypeMiddleware(log, "admin"),
-				middleware.ProxyHandler("http://127.0.0.1:8000", log),
-			},
-		},
 	}
 	routing.RegisterRoute(group, userRoutes, log)
 }

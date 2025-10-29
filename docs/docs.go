@@ -17,7 +17,6 @@ const docTemplate = `{
     "paths": {
         "/applications/jobPost/{jobPostID}": {
             "get": {
-                "description": "Get applications by job post ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -35,6 +34,19 @@ const docTemplate = `{
                         "name": "jobPostID",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "enum": [
+                            "APPLIED",
+                            "INTERVIEWING",
+                            "REJECTED",
+                            "HIRED",
+                            "SHORTLISTED"
+                        ],
+                        "type": "string",
+                        "description": "Progress Status",
+                        "name": "progressStatus",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -768,6 +780,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "progress_status": {
                     "type": "string"
                 },
                 "s3_path": {

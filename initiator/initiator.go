@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	middleware "github.com/TNAHOM/ATS-system-main/internal/glue/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -46,6 +47,9 @@ func Initiator() {
 
 	logger.Info("initializing http server")
 	server := gin.New()
+
+	// Use modular CORS middleware (defined in internal/glue/middleware)
+	server.Use(middleware.CORS())
 	// server.Use(middleware.GinLogger(*logger))
 	// server.Use(middleware.CORS())
 	// server.Use(middleware.ErrorHandler())

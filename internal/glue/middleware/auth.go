@@ -17,6 +17,12 @@ const claimsCtxKey contextKey = "claims"
 
 func AuthMiddleware(log *zap.Logger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		// Allow preflight requests to pass through without auth so browsers
+		// performing CORS preflight don't get blocked by missing Authorization.
+		if ctx.Request.Method == http.MethodOptions {
+			ctx.Next()
+			return
+		}
 		authHeader := ctx.GetHeader("Authorization")
 		if authHeader == "" {
 			log.Warn("Missing Authorization header")

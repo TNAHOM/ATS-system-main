@@ -3,6 +3,7 @@ package applicantmodule
 import (
 	"context"
 
+	enum "github.com/TNAHOM/ATS-system-main/internal/constants/Enum"
 	"github.com/TNAHOM/ATS-system-main/internal/constants/dto"
 	"github.com/TNAHOM/ATS-system-main/internal/module"
 	"github.com/TNAHOM/ATS-system-main/internal/storage"
@@ -18,8 +19,8 @@ func Init(log *zap.Logger, applicantStorage storage.Application) module.Applicat
 	return &ApplicantModule{log: log, applicantStorage: applicantStorage}
 }
 
-func (a *ApplicantModule) GetApplicationsByJobPostID(ctx context.Context, jobPostID string) ([]dto.GetApplicationsResponse, error) {
-	applicants, err := a.applicantStorage.GetApplicationsByJobPostID(ctx, jobPostID)
+func (a *ApplicantModule) GetApplicationsByJobPostID(ctx context.Context, jobPostID string, progressStatus enum.ProgressStatus) ([]dto.GetApplicationsResponse, error) {
+	applicants, err := a.applicantStorage.GetApplicationsByJobPostID(ctx, jobPostID, progressStatus)
 	if err != nil {
 		a.log.Error("Failed to get applications by job post ID", zap.Error(err))
 		return nil, err

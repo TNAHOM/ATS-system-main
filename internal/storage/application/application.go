@@ -3,6 +3,7 @@ package applicantstorage
 import (
 	"context"
 
+	enum "github.com/TNAHOM/ATS-system-main/internal/constants/Enum"
 	"github.com/TNAHOM/ATS-system-main/internal/constants/dto"
 	"github.com/TNAHOM/ATS-system-main/internal/storage"
 	"go.uber.org/zap"
@@ -18,10 +19,10 @@ func Init(log *zap.Logger, db *gorm.DB) storage.Application {
 	return &Application{log, db}
 }
 
-func (a *Application) GetApplicationsByJobPostID(ctx context.Context, jobPostID string) ([]dto.GetApplicationsResponse, error) {
+func (a *Application) GetApplicationsByJobPostID(ctx context.Context, jobPostID string, progressStatus enum.ProgressStatus) ([]dto.GetApplicationsResponse, error) {
 	var applications []dto.GetApplicationsResponse
 
-	err := a.db.WithContext(ctx).Table("applications").Where("job_post_id = ? AND status = ?", jobPostID, "COMPLETED").Find(&applications).Error
+	err := a.db.WithContext(ctx).Table("applications").Where("job_post_id = ? AND status = ? AND progress_status = ?", jobPostID, "COMPLETED", progressStatus).Find(&applications).Error
 	if err != nil {
 		a.log.Error("Failed to get applications by job post ID", zap.Error(err))
 		return nil, err

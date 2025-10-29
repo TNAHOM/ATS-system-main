@@ -13,7 +13,7 @@ func Init(group *gin.RouterGroup, log *zap.Logger, applicationHandler handler.Ap
 	applicationRoutes := []routing.Route{
 		{
 			Method:     http.MethodGet,
-			Path:       "/applications/jobPost/:jobPostID",
+			Path:       "/applications/jobPostByID/:jobPostID",
 			Handler:    applicationHandler.GetApplicationsByJobPostID,
 			Middleware: []gin.HandlerFunc{},
 		},

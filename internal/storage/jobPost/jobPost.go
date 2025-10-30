@@ -51,17 +51,28 @@ func (j *JobPost) CreateJobPost(ctx context.Context, jobPost dto.CreateJobPostRe
 	}, nil
 }
 
-func (j *JobPost) GetAllJobPostsByUserId(ctx context.Context) ([]dto.GetJobPostsResponse, error) {
+func (j *JobPost) GetAllJobPostsByUserId(ctx context.Context, p dto.PaginationRequest) ([]dto.GetJobPostsResponse, int, error) {
 	var jobPosts []models.JobPost
 	userId, err := ctx.Value("UserID").(string)
 	if !err {
 		j.log.Error("UserID not found in context")
-		return nil, gorm.ErrInvalidData
+		return nil, 0, gorm.ErrInvalidData
 	}
 
-	if err := j.db.WithContext(ctx).Find(&jobPosts, "user_id = ?", userId).Error; err != nil {
+	base := j.db.WithContext(ctx).Model(&models.JobPost{}).Where("user_id = ?", userId)
+
+	var total64 int64
+	if err := base.Count(&total64).Error; err != nil {
+		j.log.Error("failed to count job posts", zap.Error(err))
+		return nil, 0, err
+	}
+
+	total := int(total64)
+
+	offset := (p.Page - 1) * p.Size
+	if err := base.Limit(p.Size).Offset(offset).Find(&jobPosts).Error; err != nil {
 		j.log.Error("failed to fetch job posts", zap.Error(err))
-		return nil, err
+		return nil, 0, err
 	}
 
 	res := make([]dto.GetJobPostsResponse, len(jobPosts))
@@ -80,17 +91,28 @@ func (j *JobPost) GetAllJobPostsByUserId(ctx context.Context) ([]dto.GetJobPosts
 		}
 	}
 	if len(res) == 0 {
-		return []dto.GetJobPostsResponse{}, nil
+		return []dto.GetJobPostsResponse{}, total, nil
 	}
-	return res, nil
+	return res, total, nil
 }
 
-func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetJobPostsResponse, error) {
+func (j *JobPost) GetAllJobPosts(ctx context.Context, p dto.PaginationRequest) ([]dto.GetJobPostsResponse, int, error) {
 	var jobPosts []models.JobPost
 
-	if err := j.db.WithContext(ctx).Find(&jobPosts).Error; err != nil {
+	base := j.db.WithContext(ctx).Model(&models.JobPost{})
+
+	var total64 int64
+	if err := base.Count(&total64).Error; err != nil {
+		j.log.Error("failed to count job posts", zap.Error(err))
+		return nil, 0, err
+	}
+
+	total := int(total64)
+
+	offset := (p.Page - 1) * p.Size
+	if err := base.Limit(p.Size).Offset(offset).Find(&jobPosts).Error; err != nil {
 		j.log.Error("failed to fetch job posts", zap.Error(err))
-		return nil, err
+		return nil, 0, err
 	}
 
 	res := make([]dto.GetJobPostsResponse, len(jobPosts))
@@ -108,7 +130,7 @@ func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetJobPostsResponse
 			ApplicantCount:   jp.ApplicantCount,
 		}
 	}
-	return res, nil
+	return res, total, nil
 }
 
 func (j *JobPost) GetJobPostByID(ctx context.Context, id string) (dto.GetJobPostsResponse, error) {

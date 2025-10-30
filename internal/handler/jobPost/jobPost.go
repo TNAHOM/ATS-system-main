@@ -6,6 +6,7 @@ import (
 	"github.com/TNAHOM/ATS-system-main/internal/constants/dto"
 	"github.com/TNAHOM/ATS-system-main/internal/handler"
 	"github.com/TNAHOM/ATS-system-main/internal/module"
+	"github.com/TNAHOM/ATS-system-main/platform"
 	"github.com/TNAHOM/ATS-system-main/platform/response"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -85,18 +86,32 @@ func (j *jobPost) GetJobPostByID(ctx *gin.Context) {
 // @Tags JobPost
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} dto.EnvelopeGetJobPostsResponse
+// @Param page query int false "Page number" default(1)
+// @Param size query int false "Page size" default(10)
+// @Success 200 {object} dto.PaginatedGetJobPostsResponse
 // @Failure 401 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /jobPost/getAllJobPostsByUserId [get]
 func (j *jobPost) GetAllJobPostsByUserId(ctx *gin.Context) {
-	jobPosts, err := j.jobPostModule.GetAllJobPostsByUserId(ctx)
+	p, err := platform.ParsePagination(ctx)
+	if err != nil {
+		j.log.Error("invalid pagination params", zap.Error(err))
+		response.SendError(ctx, http.StatusBadRequest, "invalid pagination params", err)
+		return
+	}
+
+	items, meta, err := j.jobPostModule.GetAllJobPostsByUserId(ctx, p)
 	if err != nil {
 		j.log.Error("failed to get job posts", zap.Error(err))
 		response.SendError(ctx, http.StatusInternalServerError, "internal server error", nil)
 		return
 	}
-	ctx.JSON(http.StatusOK, dto.Envelope[[]dto.GetJobPostsResponse]{Data: jobPosts})
+
+	res := dto.PaginatedResponse[dto.GetJobPostsResponse]{
+		Items: items,
+		Meta:  meta,
+	}
+	ctx.JSON(http.StatusOK, dto.Envelope[dto.PaginatedResponse[dto.GetJobPostsResponse]]{Data: res})
 }
 
 // GetAllJobPosts godoc
@@ -104,19 +119,33 @@ func (j *jobPost) GetAllJobPostsByUserId(ctx *gin.Context) {
 // @Tags JobPost
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} dto.EnvelopeGetJobPostsResponse
+// @Param page query int false "Page number" default(1)
+// @Param size query int false "Page size" default(10)
+// @Success 200 {object} dto.PaginatedGetJobPostsResponse
 // @Failure 401 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /jobPost/getAllJobPosts [get]
 func (j *jobPost) GetAllJobPosts(ctx *gin.Context) {
-	jobPosts, err := j.jobPostModule.GetAllJobPosts(ctx)
+	p, err := platform.ParsePagination(ctx)
+	if err != nil {
+		j.log.Error("invalid pagination params", zap.Error(err))
+		response.SendError(ctx, http.StatusBadRequest, "invalid pagination params", err)
+		return
+	}
+
+	jobPosts, meta, err := j.jobPostModule.GetAllJobPosts(ctx, p)
 	if err != nil {
 		j.log.Error("failed to get job posts", zap.Error(err))
 		response.SendError(ctx, http.StatusInternalServerError, "internal server error", nil)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, dto.Envelope[[]dto.GetJobPostsResponse]{Data: jobPosts})
+	res := dto.PaginatedResponse[dto.GetJobPostsResponse]{
+		Items: jobPosts,
+		Meta:  meta,
+	}
+
+	ctx.JSON(http.StatusOK, dto.Envelope[dto.PaginatedResponse[dto.GetJobPostsResponse]]{Data: res})
 }
 
 // UpdateJobPost godoc

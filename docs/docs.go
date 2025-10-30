@@ -225,11 +225,27 @@ const docTemplate = `{
                     "JobPost"
                 ],
                 "summary": "List all job posts",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Page size",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.EnvelopeGetJobPostsResponse"
+                            "$ref": "#/definitions/dto.PaginatedGetJobPostsResponse"
                         }
                     },
                     "401": {
@@ -261,11 +277,27 @@ const docTemplate = `{
                     "JobPost"
                 ],
                 "summary": "List all job posts",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Page size",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.EnvelopeGetJobPostsResponse"
+                            "$ref": "#/definitions/dto.PaginatedGetJobPostsResponse"
                         }
                     },
                     "401": {
@@ -883,6 +915,35 @@ const docTemplate = `{
                 },
                 "user_type": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.PaginatedGetJobPostsResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GetJobPostsResponse"
+                    }
+                },
+                "meta": {
+                    "$ref": "#/definitions/dto.PaginationMeta"
+                }
+            }
+        },
+        "dto.PaginationMeta": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "total": {
+                    "description": "pointer so we can omit when unknown",
+                    "type": "integer"
                 }
             }
         },

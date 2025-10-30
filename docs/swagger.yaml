@@ -259,6 +259,25 @@ definitions:
       user_type:
         type: string
     type: object
+  dto.PaginatedGetJobPostsResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.GetJobPostsResponse'
+        type: array
+      meta:
+        $ref: '#/definitions/dto.PaginationMeta'
+    type: object
+  dto.PaginationMeta:
+    properties:
+      page:
+        type: integer
+      size:
+        type: integer
+      total:
+        description: pointer so we can omit when unknown
+        type: integer
+    type: object
   dto.UpdateJobPostRequest:
     properties:
       deadline:
@@ -484,13 +503,24 @@ paths:
       - JobPost
   /jobPost/getAllJobPosts:
     get:
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: size
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.EnvelopeGetJobPostsResponse'
+            $ref: '#/definitions/dto.PaginatedGetJobPostsResponse'
         "401":
           description: Unauthorized
           schema:
@@ -506,13 +536,24 @@ paths:
       - JobPost
   /jobPost/getAllJobPostsByUserId:
     get:
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: size
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.EnvelopeGetJobPostsResponse'
+            $ref: '#/definitions/dto.PaginatedGetJobPostsResponse'
         "401":
           description: Unauthorized
           schema:

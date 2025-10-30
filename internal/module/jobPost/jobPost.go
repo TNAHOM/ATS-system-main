@@ -103,24 +103,36 @@ func (j *JobPost) GetJobPostByID(ctx context.Context, id string) (dto.GetJobPost
 	return jobPost, nil
 }
 
-func (j *JobPost) GetAllJobPostsByUserId(ctx context.Context) ([]dto.GetJobPostsResponse, error) {
-	jobPosts, err := j.jobPostStorage.GetAllJobPostsByUserId(ctx)
+func (j *JobPost) GetAllJobPostsByUserId(ctx context.Context, p dto.PaginationRequest) ([]dto.GetJobPostsResponse, dto.PaginationMeta, error) {
+	jobPosts, total, err := j.jobPostStorage.GetAllJobPostsByUserId(ctx, p)
 	if err != nil {
 		j.log.Error("failed to get all job posts", zap.Error(err))
-		return nil, err
+		return nil, dto.PaginationMeta{}, err
 	}
 
-	return jobPosts, nil
+	t := total
+	meta := dto.PaginationMeta{
+		Total: &t,
+		Page:  p.Page,
+		Size:  p.Size,
+	}
+	return jobPosts, meta, nil
+
 }
 
-func (j *JobPost) GetAllJobPosts(ctx context.Context) ([]dto.GetJobPostsResponse, error) {
-	jobPosts, err := j.jobPostStorage.GetAllJobPosts(ctx)
+func (j *JobPost) GetAllJobPosts(ctx context.Context, p dto.PaginationRequest) ([]dto.GetJobPostsResponse, dto.PaginationMeta, error) {
+	items, total, err := j.jobPostStorage.GetAllJobPosts(ctx, p)
 	if err != nil {
 		j.log.Error("failed to get all job posts", zap.Error(err))
-		return nil, err
+		return nil, dto.PaginationMeta{}, err
 	}
 
-	return jobPosts, nil
+	meta := dto.PaginationMeta{
+		Total: &total,
+		Page:  p.Page,
+		Size:  p.Size,
+	}
+	return items, meta, nil
 }
 
 func (j *JobPost) UpdateJobPost(ctx context.Context, req dto.UpdateJobPostRequest) (dto.GetJobPostsResponse, error) {

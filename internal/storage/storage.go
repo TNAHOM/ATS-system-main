@@ -18,8 +18,9 @@ type Users interface {
 
 type JobPosts interface {
 	CreateJobPost(ctx context.Context, jobPost dto.CreateJobPostRequest) (dto.CreateJobPostResponse, error)
-	GetAllJobPostsByUserId(ctx context.Context) ([]dto.GetJobPostsResponse, error)
-	GetAllJobPosts(ctx context.Context) ([]dto.GetJobPostsResponse, error)
+
+	GetAllJobPostsByUserId(ctx context.Context, p dto.PaginationRequest) ([]dto.GetJobPostsResponse, int, error)
+	GetAllJobPosts(ctx context.Context, p dto.PaginationRequest) ([]dto.GetJobPostsResponse, int, error)
 
 	GetJobPostByID(ctx context.Context, id string) (dto.GetJobPostsResponse, error)
 	UpdateJobPost(ctx context.Context, req dto.UpdateJobPostRequest) (dto.GetJobPostsResponse, error)

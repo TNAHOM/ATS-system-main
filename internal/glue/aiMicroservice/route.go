@@ -2,6 +2,7 @@ package aimicroservice
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/TNAHOM/ATS-system-main/internal/glue/middleware"
 	"github.com/TNAHOM/ATS-system-main/internal/glue/routing"
@@ -10,11 +11,12 @@ import (
 )
 
 func Init(group *gin.RouterGroup, log *zap.Logger) {
+	aiBaseUrl := os.Getenv("AI_SERVICE_URL")
 	aiMicroserviceRoutes := []routing.Route{
 		{
 			Method:     http.MethodPost,
 			Path:       "/resumes/upload",
-			Handler:    middleware.ProxyHandler("http://127.0.0.1:8000/resumes/upload", log),
+			Handler:    middleware.ProxyHandler(aiBaseUrl+"/resumes/upload", log),
 			Middleware: []gin.HandlerFunc{
 				// middleware.AuthMiddleware(log),
 				// middleware.AuthUserTypeMiddleware(log, "admin"),
@@ -23,7 +25,7 @@ func Init(group *gin.RouterGroup, log *zap.Logger) {
 		{
 			Method:  http.MethodGet,
 			Path:    "/resumes/application/:applicationID",
-			Handler: middleware.ProxyHandler("http://127.0.0.1:8000/resumes/application/:applicationID", log),
+			Handler: middleware.ProxyHandler(aiBaseUrl+"/resumes/application/:applicationID", log),
 			Middleware: []gin.HandlerFunc{
 				middleware.AuthMiddleware(log),
 				// middleware.AuthUserTypeMiddleware(log, "admin"),

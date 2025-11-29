@@ -20,4 +20,5 @@ type JobPost interface {
 type Application interface {
 	// GetApplicationsByApplicantID(ctx *gin.Context)
 	GetApplicationsByJobPostID(ctx *gin.Context)
+	UpdateApplicationProgressStatus(ctx *gin.Context)
 }

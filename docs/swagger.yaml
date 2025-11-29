@@ -125,9 +125,7 @@ definitions:
   dto.EnvelopeGetApplicationsResponse:
     properties:
       data:
-        items:
-          $ref: '#/definitions/dto.GetApplicationsResponse'
-        type: array
+        $ref: '#/definitions/dto.GetApplicationsResponseWithMetaData'
       error:
         $ref: '#/definitions/dto.ErrorResponse'
     type: object
@@ -146,6 +144,13 @@ definitions:
         $ref: '#/definitions/dto.LoginUserResponse'
       error:
         type: string
+    type: object
+  dto.EnvelopeUpdateApplicationResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.UpdateApplicationResponse'
+      error:
+        $ref: '#/definitions/dto.ErrorResponse'
     type: object
   dto.EnvelopeUpdateJobPostResponse:
     properties:
@@ -200,6 +205,15 @@ definitions:
       status:
         type: string
     type: object
+  dto.GetApplicationsResponseWithMetaData:
+    properties:
+      applications:
+        items:
+          $ref: '#/definitions/dto.GetApplicationsResponse'
+        type: array
+      meta_data:
+        $ref: '#/definitions/dto.GetMetaDataApplicationsResponse'
+    type: object
   dto.GetJobPostsResponse:
     properties:
       applicant_count:
@@ -226,6 +240,21 @@ definitions:
         type: string
       user_id:
         type: string
+    type: object
+  dto.GetMetaDataApplicationsResponse:
+    properties:
+      applied_count:
+        type: integer
+      hired_count:
+        type: integer
+      interviewing_count:
+        type: integer
+      rejected_count:
+        type: integer
+      shortlisted_count:
+        type: integer
+      total_count:
+        type: integer
     type: object
   dto.LoginUserRequest:
     properties:
@@ -277,6 +306,13 @@ definitions:
       total:
         description: pointer so we can omit when unknown
         type: integer
+    type: object
+  dto.UpdateApplicationResponse:
+    properties:
+      id:
+        type: string
+      progress_status:
+        type: string
     type: object
   dto.UpdateJobPostRequest:
     properties:
@@ -342,7 +378,46 @@ info:
   title: ATS System API
   version: "1.0"
 paths:
-  /applications/jobPost/{jobPostID}:
+  /applications/{applicationID}/progressStatus:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Application ID
+        in: path
+        name: applicationID
+        required: true
+        type: string
+      - description: Progress Status
+        enum:
+        - APPLIED
+        - INTERVIEWING
+        - REJECTED
+        - HIRED
+        - SHORTLISTED
+        in: query
+        name: progressStatus
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EnvelopeUpdateApplicationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Update application progress status
+      tags:
+      - applications
+  /applications/jobPostByID/:jobPostID:
     get:
       consumes:
       - application/json

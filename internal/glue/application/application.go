@@ -17,6 +17,12 @@ func Init(group *gin.RouterGroup, log *zap.Logger, applicationHandler handler.Ap
 			Handler:    applicationHandler.GetApplicationsByJobPostID,
 			Middleware: []gin.HandlerFunc{},
 		},
+		{
+			Method:     http.MethodPatch,
+			Path:       "/applications/:applicationID/progressStatus",
+			Handler:    applicationHandler.UpdateApplicationProgressStatus,
+			Middleware: []gin.HandlerFunc{},
+		},
 	}
 	routing.RegisterRoute(group, applicationRoutes, log)
 }

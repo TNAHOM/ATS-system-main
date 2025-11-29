@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/applications/jobPost/{jobPostID}": {
+        "/applications/jobPostByID/:jobPostID": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -54,6 +54,63 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dto.EnvelopeGetApplicationsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{applicationID}/progressStatus": {
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "applications"
+                ],
+                "summary": "Update application progress status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Application ID",
+                        "name": "applicationID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "APPLIED",
+                            "INTERVIEWING",
+                            "REJECTED",
+                            "HIRED",
+                            "SHORTLISTED"
+                        ],
+                        "type": "string",
+                        "description": "Progress Status",
+                        "name": "progressStatus",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EnvelopeUpdateApplicationResponse"
                         }
                     },
                     "400": {
@@ -712,10 +769,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.GetApplicationsResponse"
-                    }
+                    "$ref": "#/definitions/dto.GetApplicationsResponseWithMetaData"
                 },
                 "error": {
                     "$ref": "#/definitions/dto.ErrorResponse"
@@ -744,6 +798,17 @@ const docTemplate = `{
                 },
                 "error": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.EnvelopeUpdateApplicationResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.UpdateApplicationResponse"
+                },
+                "error": {
+                    "$ref": "#/definitions/dto.ErrorResponse"
                 }
             }
         },
@@ -828,6 +893,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.GetApplicationsResponseWithMetaData": {
+            "type": "object",
+            "properties": {
+                "applications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GetApplicationsResponse"
+                    }
+                },
+                "meta_data": {
+                    "$ref": "#/definitions/dto.GetMetaDataApplicationsResponse"
+                }
+            }
+        },
         "dto.GetJobPostsResponse": {
             "type": "object",
             "properties": {
@@ -866,6 +945,29 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.GetMetaDataApplicationsResponse": {
+            "type": "object",
+            "properties": {
+                "applied_count": {
+                    "type": "integer"
+                },
+                "hired_count": {
+                    "type": "integer"
+                },
+                "interviewing_count": {
+                    "type": "integer"
+                },
+                "rejected_count": {
+                    "type": "integer"
+                },
+                "shortlisted_count": {
+                    "type": "integer"
+                },
+                "total_count": {
+                    "type": "integer"
                 }
             }
         },
@@ -944,6 +1046,17 @@ const docTemplate = `{
                 "total": {
                     "description": "pointer so we can omit when unknown",
                     "type": "integer"
+                }
+            }
+        },
+        "dto.UpdateApplicationResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "progress_status": {
+                    "type": "string"
                 }
             }
         },

@@ -27,5 +27,6 @@ type JobPost interface {
 
 type Application interface {
 	// GetApplicationsByApplicantID(ctx context.Context, applicantID string) ([]dto.GetApplicationsResponse, error)
-	GetApplicationsByJobPostID(ctx context.Context, jobPostID string, progressStatus enum.ProgressStatus) ([]dto.GetApplicationsResponse, error)
+	GetApplicationsByJobPostID(ctx context.Context, jobPostID string, progressStatus enum.ProgressStatus) (dto.GetApplicationsResponseWithMetaData, error)
+	UpdateApplicationProgressStatus(ctx context.Context, applicationID string, progressStatus enum.ProgressStatus) (dto.UpdateApplicationResponse, error)
 }

@@ -32,7 +32,7 @@ func Init(log *zap.Logger, application module.Application) handler.Application {
 // @Success 200 {object} dto.EnvelopeGetApplicationsResponse
 // @Failure 400 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
-// @Router /applications/jobPost/{jobPostID} [get]
+// @Router /applications/jobPostByID/:jobPostID [get]
 func (a *Application) GetApplicationsByJobPostID(ctx *gin.Context) {
 	jobPostID := ctx.Param("jobPostID")
 	getProgressStatus := ctx.DefaultQuery("progressStatus", string(enum.APPLIED))
@@ -55,5 +55,47 @@ func (a *Application) GetApplicationsByJobPostID(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, dto.EnvelopeGetApplicationsResponse{Data: applications})
+	ctx.JSON(http.StatusOK, dto.EnvelopeGetApplicationsResponse{Data: applications, Error: nil})
+}
+
+// updateApplicationProgressStatus godoc
+// @Summary Update application progress status
+// @Tags applications
+// @Accept json
+// @Produce json
+// @Param applicationID path string true "Application ID"
+// @Param progressStatus query string true "Progress Status" enums(APPLIED,INTERVIEWING,REJECTED,HIRED,SHORTLISTED)
+// @Success 200 {object} dto.EnvelopeUpdateApplicationResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /applications/{applicationID}/progressStatus [patch]
+func (a *Application) UpdateApplicationProgressStatus(ctx *gin.Context) {
+	applicationID := ctx.Param("applicationID")
+	if err := uuid.Validate(applicationID); err != nil {
+		a.log.Warn("Invalid applicationID format")
+		response.SendError(ctx, http.StatusBadRequest, "Invalid applicationID format", nil)
+		return
+	}
+	getProgressStatus := ctx.Query("progressStatus")
+	if !enum.IsValidProgressStatus(getProgressStatus) {
+		a.log.Warn("Invalid progressStatus", zap.String("progressStatus", getProgressStatus))
+		response.SendError(ctx, http.StatusBadRequest, "Invalid progressStatus", nil)
+		return
+	}
+
+	progressStatus := enum.ProgressStatus(getProgressStatus)
+	if err := uuid.Validate(applicationID); err != nil {
+		a.log.Warn("Invalid applicationID format")
+		response.SendError(ctx, http.StatusBadRequest, "Invalid applicationID format", nil)
+		return
+	}
+
+	updatedApplication, err := a.application.UpdateApplicationProgressStatus(ctx, applicationID, progressStatus)
+	if err != nil {
+		a.log.Error(err.Error(), zap.String("applicationID", applicationID))
+		response.SendError(ctx, http.StatusInternalServerError, "Internal server error", nil)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.EnvelopeUpdateApplicationResponse{Data: updatedApplication})
 }
